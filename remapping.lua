@@ -35,7 +35,7 @@ end
 -- hs.hotkey.bind(mods, key, [message,] pressedfn, releasedfn, repeatfn)
 -- hs.hotkey.new(mods, key, [message,] pressedfn, releasedfn, repeatfn):enable()
 function remap(mods, key, pressFn)
-	hs.hotkey.bind(mods, key, pressFn, nil, pressFn)
+	return hs.hotkey.bind(mods, key, pressFn, nil, pressFn)
 end
 
 
@@ -44,14 +44,18 @@ end
 -- "tgtArgsFn" is a function to determine how "opt_mods" is applied to "pressedFn".
 -- e.g., "modsConcat" concatenates "opt_mods" with "mods" for "pressedFn".
 function remap_ex(mods, key, pressedFn, pressedFnArgs, tgtArgsFn, options)
-    remap(mods, key, pressedFn(table.unpack(pressedFnArgs)))
+    local hotkeys = {}
+    local hotkey = remap(mods, key, pressedFn(table.unpack(pressedFnArgs)))
+    table.insert(hotkeys, hotkey)
     for r = 1, #options do
         for _, opt_mods in ipairs(combinations(options, r)) do
             local src_mods = concatenate(mods, opt_mods)
             local tgt_args = tgtArgsFn(pressedFnArgs, opt_mods)
-            remap(src_mods, key, pressedFn(table.unpack(tgt_args)))
+            hotkey = remap(src_mods, key, pressedFn(table.unpack(tgt_args)))
+            table.insert(hotkeys, hotkey)
         end
     end
+    return hotkeys
 end
 
 

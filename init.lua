@@ -64,10 +64,25 @@ remap({'ctrl'}, 'delete', keyStroke('forwarddelete'))
 for arrw, src in pairs({up='i', left='j', down='k', right='l'}) do
     remap_ex({'ctrl'}, src, keyStroke, {arrw}, modsConcat, {'shift'})
 end
-remap_ex({'ctrl'}, 'b', keyStroke, {{'alt'}, 'left'}, modsConcat, {'shift'})
-remap_ex({'ctrl'}, 'f', keyStroke, {{'alt'}, 'right'}, modsConcat, {'shift'})
+ctrlb = remap_ex({'ctrl'}, 'b', keyStroke, {{'alt'}, 'left'}, modsConcat, {'shift'})
+ctrlf = remap_ex({'ctrl'}, 'f', keyStroke, {{'alt'}, 'right'}, modsConcat, {'shift'})
 remap_ex({'ctrl'}, 'p', keyStroke, {'pageup'}, modsConcat, {'shift'})
 remap_ex({'ctrl'}, 'n', keyStroke, {'pagedown'}, modsConcat, {'shift'})
+
+bypass = false
+function applicationWatcher(appName, eventType, appObject)
+    if (eventType == hs.application.watcher.activated) then
+        if (appName == "iTerm2") then
+            ctrlb[1]:disable()
+            ctrlf[1]:disable()
+        else
+            ctrlb[1]:enable()
+            ctrlf[1]:enable()
+        end
+    end
+end
+appWatcher = hs.application.watcher.new(applicationWatcher)
+appWatcher:start()
 
 
 -- This code can distinguish between 'mod'(leftmod) and 'rightmod'.
