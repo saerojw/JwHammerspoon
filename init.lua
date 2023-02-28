@@ -51,9 +51,6 @@ hs.hotkey.bind({'cmd', 'ctrl', 'alt', 'shift'}, 'h',
 )
 
 
--- 'capslock' is replaced with 'rightctrl' (System Preference > Keyboard > Keyboard > Modifier Keys).
-
-
 require "remapping"
 -- remap(src_mods, src_key, keyStroke([tgt_mods,] tgt_key))
 -- remap_ex(src_mods, src_key, keyStroke, {[tgt_mods,] tgt_key}, modsConcat, options)
@@ -85,6 +82,12 @@ appWatcher = hs.application.watcher.new(applicationWatcher)
 appWatcher:start()
 
 
+-- 'capslock' is replaced with 'rightctrl' (System Preference > Keyboard > Keyboard > Modifier Keys).
+-- disable 'Use the CapsLock key to switch to and from U.S.' (System Preference > Keyboard > Input Sources)
+require "capslock"
+hs.hotkey.bind({'shift'}, 'space', toggle_capslock_with_alert)
+
+
 -- This code can distinguish between 'mod'(leftmod) and 'rightmod'.
 require "language"
 require "separate_mods"
@@ -98,13 +101,6 @@ modChange_event = hs.eventtap.new(
         -- toggle Korean/English by tapping 'rightctrl'
         if FLAGS.condition(keycode, 'rightctrl', 'tapped') then
             toggle_language('Korean', 'English')
-        -- toggle 'capslock' by 'shift'+'rightctrl'
-        elseif (FLAGS.pressedAny({'shift', 'rightshift'}) and FLAGS.pressed('rightctrl')) then
-            FLAGS.capslock = true
-        elseif (FLAGS.capslock and FLAGS.condition(keycode, 'rightctrl', 'released')) then
-            -- toggle_capslock_with_alert()
-            hs.hid.capslock.toggle()
-            FLAGS.capslock = nil
         end
 
         if FLAGS[keycode]~=nil and not FLAGS[keycode].isPressed then
@@ -126,7 +122,6 @@ keyDown_event = hs.eventtap.new(
         if keycode==';' and LAST_STROKE=='escape' then
             set_language('English')
         end
-        FLAGS.capslock = nil
     end
 )
 keyDown_event:start()
@@ -148,7 +143,6 @@ keyUp_event = hs.eventtap.new(
             hs.alert.closeAll()
             HS_MODE.activated = false
         end
-        FLAGS.capslock = nil
     end
 )
 keyUp_event:start()
