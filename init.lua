@@ -4,8 +4,8 @@ local function monitor(keycode, state)
     if MONITORING then
         if MONITORING['stroke'] then
             local pressed_mods = {}
-            for _, kc_mod in ipairs(FLAGS.keycodes) do
-                if FLAGS[kc_mod].isPressed then
+            for _, kc_mod in ipairs(MODS.keycodes) do
+                if MODS[kc_mod].isPressed then
                     table.insert(pressed_mods, kc_mod)
                 end
             end
@@ -15,8 +15,8 @@ local function monitor(keycode, state)
             local M, S = 5, 12
             print('\t\t\t +-'..string.rep('-', M)..'-+-'..string.rep('-', S)..'-+-'..string.rep('-', S)..'-+')
             for _, mod in ipairs({'cmd', 'ctrl', 'alt', 'shift'}) do
-                local L_state = FLAGS.get_state(mod)
-                local R_state = FLAGS.get_state('right'..mod)
+                local L_state = MODS.get_state(mod)
+                local R_state = MODS.get_state('right'..mod)
                 print('\t\t\t | '
                     ..mod..string.rep(' ', M-string.len(mod))..' | '
                     ..L_state..string.rep(' ', S-string.len(L_state))..' | '
@@ -50,7 +50,6 @@ hs.hotkey.bind({'cmd', 'ctrl', 'alt', 'shift'}, 'h',
     end
 )
 
-
 require "remapping"
 -- remap(src_mods, src_key, keyStroke([tgt_mods,] tgt_key))
 -- remap_ex(src_mods, src_key, keyStroke, {[tgt_mods,] tgt_key}, modsConcat, options)
@@ -58,28 +57,19 @@ require "remapping"
 -- "remap_ex" extends "mods" to include combinations of "options" called "opt_mods".
 -- "modsConcat" concatenates "opt_mods" with "mods" for "keyStroke".
 remap({'ctrl'}, 'delete', keyStroke('forwarddelete'))
-for arrw, src in pairs({up='i', left='j', down='k', right='l'}) do
-    remap_ex({'ctrl'}, src, keyStroke, {arrw}, modsConcat, {'shift'})
-end
-ctrlb = remap_ex({'ctrl'}, 'b', keyStroke, {{'alt'}, 'left'}, modsConcat, {'shift'})
-ctrlf = remap_ex({'ctrl'}, 'f', keyStroke, {{'alt'}, 'right'}, modsConcat, {'shift'})
-remap_ex({'ctrl'}, 'p', keyStroke, {'pageup'}, modsConcat, {'shift'})
-remap_ex({'ctrl'}, 'n', keyStroke, {'pagedown'}, modsConcat, {'shift'})
 
-bypass = false
-function applicationWatcher(appName, eventType, appObject)
-    if (eventType == hs.application.watcher.activated) then
-        if (appName == "iTerm2") then
-            ctrlb[1]:disable()
-            ctrlf[1]:disable()
-        else
-            ctrlb[1]:enable()
-            ctrlf[1]:enable()
-        end
-    end
+-- RightControlHotkeys
+RCH = {}
+for arrw, src in pairs({up='i', left='j', down='k', right='l'}) do
+    RCH = concat(RCH, remap_ex({'ctrl'}, src, keyStroke, {arrw}, modsConcat, {'shift'}))
 end
-appWatcher = hs.application.watcher.new(applicationWatcher)
-appWatcher:start()
+RCH = concat(RCH, remap_ex({'ctrl'}, 'b', keyStroke, {{'alt'}, 'left'}, modsConcat, {'shift'}))
+RCH = concat(RCH, remap_ex({'ctrl'}, 'f', keyStroke, {{'alt'}, 'right'}, modsConcat, {'shift'}))
+RCH = concat(RCH, remap_ex({'ctrl'}, 'p', keyStroke, {'pageup'}, modsConcat, {'shift'}))
+RCH = concat(RCH, remap_ex({'ctrl'}, 'n', keyStroke, {'pagedown'}, modsConcat, {'shift'}))
+for _, hotkey in ipairs(RCH) do
+    hotkey:disable()
+end
 
 
 -- 'capslock' is replaced with 'rightctrl' (System Preference > Keyboard > Keyboard > Modifier Keys).
@@ -90,21 +80,52 @@ hs.hotkey.bind({'shift'}, 'space', toggle_capslock_with_alert)
 
 -- This code can distinguish between 'mod'(leftmod) and 'rightmod'.
 require "language"
+hs.hotkey.bind({'ctrl'}, 'space', nil, nil, function() end)
+
+
+iTerm2 = false
+function applicationWatcher(appName, eventType, appObject)
+    if (eventType == hs.application.watcher.activated) then
+        if (appName == "iTerm2") then
+            iTerm2 = true
+        else
+            iTerm2 = false
+        end
+    end
+end
+appWatcher = hs.application.watcher.new(applicationWatcher)
+appWatcher:start()
+
+
 require "separate_mods"
-FLAGS = separated_mods_FLAGS()
+MODS = separated_mods_FLAGS()
 modChange_event = hs.eventtap.new(
     {hs.eventtap.event.types.flagsChanged},
     function (event)
-        local keycode = FLAGS.update(event)
+        local keycode = MODS.update(event)
         monitor(keaycode)
 
-        -- toggle Korean/English by tapping 'rightctrl'
-        if FLAGS.condition(keycode, 'rightctrl', 'tapped') then
-            toggle_language('Korean', 'English')
+        -- set English by tapping 'rightctrl'
+        if MODS.condition(keycode, 'rightctrl', 'tapped') then
+            set_language('English')
         end
 
-        if FLAGS[keycode]~=nil and not FLAGS[keycode].isPressed then
-            FLAGS.reset()
+        if keycode=='rightctrl' then
+            if MODS['rightctrl'].isPressed then
+                for _, hotkey in ipairs(RCH) do
+                    hotkey:enable()
+                    if iTerm2 and (hotkey['msg']=='⌃B' or hotkey['msg']=='⌃F') then
+                        hotkey:disable()
+                    end
+                end
+            else
+                for _, hotkey in ipairs(RCH) do
+                    hotkey:disable()
+                end
+            end
+        end
+        if MODS[keycode]~=nil and not MODS[keycode].isPressed then
+            MODS.reset()
         end
     end
 )
@@ -114,7 +135,7 @@ modChange_event:start()
 keyDown_event = hs.eventtap.new(
     {hs.eventtap.event.types.keyDown},
     function (event)
-        local keycode = FLAGS.update(event)
+        local keycode = MODS.update(event)
         monitor(keycode, 'pressed')
 
         -- If last key stroke is 'escape', change input source to English when ';' pressed.
@@ -130,8 +151,16 @@ keyDown_event:start()
 keyUp_event = hs.eventtap.new(
     {hs.eventtap.event.types.keyUp},
     function (event)
-        local keycode = FLAGS.update(event)
+        local keycode = MODS.update(event)
         monitor(keycode, 'released')
+
+        -- set Korean with 'rightctrl' + 'space'
+        if keycode=='space' and MODS['rightctrl'].isPressed then
+            set_language('Korean')
+        -- toggle Korean/English with '(logitech)Fn' + space or '(left)ctrl' + space
+        elseif keycode=='kana' or (keycode=='space' and MODS.pressedExactly({'ctrl'})) then
+            toggle_language('Korean', 'English')
+        end
 
         -- record last stroke
         LAST_STROKE = keycode
@@ -143,6 +172,7 @@ keyUp_event = hs.eventtap.new(
             hs.alert.closeAll()
             HS_MODE.activated = false
         end
+
     end
 )
 keyUp_event:start()
