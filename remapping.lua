@@ -7,7 +7,7 @@ local function combinations(objects, r)
             local first_choose = table.remove(remainder, 1)
             local sub_samples = combinations(remainder, r-1)
             for j, sub_sample in pairs(sub_samples) do
-                local sample = concatenate({first_choose}, sub_sample)
+                local sample = concat({first_choose}, sub_sample)
                 table.insert(samples, sample)
             end
         end
@@ -49,7 +49,7 @@ function remap_ex(mods, key, pressedFn, pressedFnArgs, tgtArgsFn, options)
     table.insert(hotkeys, hotkey)
     for r = 1, #options do
         for _, opt_mods in ipairs(combinations(options, r)) do
-            local src_mods = concatenate(mods, opt_mods)
+            local src_mods = concat(mods, opt_mods)
             local tgt_args = tgtArgsFn(pressedFnArgs, opt_mods)
             hotkey = remap(src_mods, key, pressedFn(table.unpack(tgt_args)))
             table.insert(hotkeys, hotkey)
@@ -65,7 +65,7 @@ function modsConcat(mods_key, opt_mods)
         key = mods
         mods = {}
     end
-    return {concatenate(mods, opt_mods), key}
+    return {concat(mods, opt_mods), key}
 end
 
 

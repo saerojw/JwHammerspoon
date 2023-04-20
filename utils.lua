@@ -1,4 +1,5 @@
 -- table utils
+
 function copy(t)
     local ret = {}
     for k, v in pairs(t) do
@@ -12,7 +13,7 @@ function copy(t)
 end
 
 
-function concatenate(...)
+function concat(...)
     local tables = {...}
     local ret = {}
     for _, t in ipairs(tables) do

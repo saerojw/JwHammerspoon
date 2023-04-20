@@ -3,18 +3,18 @@ local KC_MODS = {'cmd', 'ctrl', 'alt', 'shift', 'rightcmd', 'rightctrl', 'righta
 
 local function reset()
     for _, kc_mod in ipairs(KC_MODS) do
-        FLAGS[kc_mod].beenPressedAlone = false
+        MODS[kc_mod].beenPressedAlone = false
     end
 end
 
 local function pressed(mod)
-    return FLAGS[mod].isPressed
+    return MODS[mod].isPressed
 end
 
 local function pressedAny(mods)
     local ret = false
     for _, mod in ipairs(mods) do
-        ret = ret or FLAGS[mod].isPressed
+        ret = ret or MODS[mod].isPressed
     end
     return ret
 end
@@ -22,27 +22,37 @@ end
 local function pressedAll(mods)
     local ret = true
     for _, mod in ipairs(mods) do
-        ret = ret and FLAGS[mod].isPressed
+        ret = ret and MODS[mod].isPressed
     end
     return ret
 end
 
 local function pressedExactly(mods)
     local ret = true
-    for _, mod in ipairs(KC_MODS) do
-        if mods[mod] then
+    for _, kc_mod in ipairs(KC_MODS) do
+        local mod_in_mods = false
+        for _, mod in ipairs(mods) do
+            if kc_mod == mod then
+                in_mods = true
+                break
+            end
+        end
+        if (not in_mods and MODS[mod].isPressed) or (in_mods and not MODS[mod].isPressed) then
+            ret  = false
+            break
         end
     end
+    return ret
 end
 
 local function get_state(kc_mod)
     local state = {[true] ={[true]='pressedAlone', [false]='pressed' },
                    [false]={[true]='tapped',       [false]='released'}}
-    return state[FLAGS[kc_mod].isPressed][FLAGS[kc_mod].beenPressedAlone]
+    return state[MODS[kc_mod].isPressed][MODS[kc_mod].beenPressedAlone]
 end
 
 local function condition(keycode, kc_mod, state)
-    return keycode==kc_mod and FLAGS.get_state(kc_mod)==state
+    return keycode==kc_mod and MODS.get_state(kc_mod)==state
 end
 
 local function update(event)
@@ -53,41 +63,42 @@ local function update(event)
         for _, mod in ipairs({'cmd', 'ctrl', 'alt', 'shift'}) do
             if flags[mod] then  -- mod is pressed
                 if keycode==mod then
-                    FLAGS[mod].isPressed = not FLAGS[mod].isPressed
-                    FLAGS[mod].beenPressedAlone = not FLAGS['right'..mod].isPressed and flags:containExactly({mod})
-                    FLAGS['right'..mod].beenPressedAlone = not FLAGS[mod].isPressed and flags:containExactly({mod})
+                    MODS[mod].isPressed = not MODS[mod].isPressed
+                    MODS[mod].beenPressedAlone = not MODS['right'..mod].isPressed and flags:containExactly({mod})
+                    MODS['right'..mod].beenPressedAlone = not MODS[mod].isPressed and flags:containExactly({mod})
                 elseif keycode=='right'..mod then
-                    FLAGS['right'..mod].isPressed = not FLAGS['right'..mod].isPressed
-                    FLAGS[mod].beenPressedAlone = not FLAGS['right'..mod].isPressed and flags:containExactly({mod})
-                    FLAGS['right'..mod].beenPressedAlone = not FLAGS[mod].isPressed and flags:containExactly({mod})
+                    MODS['right'..mod].isPressed = not MODS['right'..mod].isPressed
+                    MODS[mod].beenPressedAlone = not MODS['right'..mod].isPressed and flags:containExactly({mod})
+                    MODS['right'..mod].beenPressedAlone = not MODS[mod].isPressed and flags:containExactly({mod})
                 else
-                    FLAGS[mod].beenPressedAlone = false
-                    FLAGS['right'..mod].beenPressedAlone = false
+                    MODS[mod].beenPressedAlone = false
+                    MODS['right'..mod].beenPressedAlone = false
                 end
             else
-                FLAGS[mod].isPressed = false
-                FLAGS['right'..mod].isPressed = false
+                MODS[mod].isPressed = false
+                MODS['right'..mod].isPressed = false
             end
         end
     else
-        FLAGS.reset()
+        MODS.reset()
     end
     return keycode
 end
 
 
 function separated_mods_FLAGS()
-    FLAGS = {}
+    MODS = {}
     for _, kc_mod in ipairs(KC_MODS) do
-        FLAGS[kc_mod] = {isPressed=false, beenPressedAlone=false}
+        MODS[kc_mod] = {isPressed=false, beenPressedAlone=false}
     end
-    FLAGS.reset = reset
-    FLAGS.pressed = pressed
-    FLAGS.pressedAny = pressedAny
-    FLAGS.pressedAll = pressedAll
-    FLAGS.get_state = get_state
-    FLAGS.update = update
-    FLAGS.condition = condition
-    FLAGS.keycodes = KC_MODS
-    return FLAGS
+    MODS.reset = reset
+    MODS.pressed = pressed
+    MODS.pressedAny = pressedAny
+    MODS.pressedAll = pressedAll
+    MODS.pressedExactly = pressedExactly
+    MODS.get_state = get_state
+    MODS.update = update
+    MODS.condition = condition
+    MODS.keycodes = KC_MODS
+    return MODS
 end
