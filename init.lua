@@ -80,7 +80,7 @@ hs.hotkey.bind({'shift'}, 'space', toggle_capslock_with_alert)
 
 -- This code can distinguish between 'mod'(leftmod) and 'rightmod'.
 require "language"
-hs.hotkey.bind({'ctrl'}, 'space', nil, nil, function() end)
+hs.hotkey.bind({'ctrl'}, 'space', function() end)
 
 
 iTerm2 = false

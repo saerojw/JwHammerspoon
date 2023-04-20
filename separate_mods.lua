@@ -30,14 +30,14 @@ end
 local function pressedExactly(mods)
     local ret = true
     for _, kc_mod in ipairs(KC_MODS) do
-        local mod_in_mods = false
+        local in_mods = false
         for _, mod in ipairs(mods) do
             if kc_mod == mod then
                 in_mods = true
                 break
             end
         end
-        if (not in_mods and MODS[mod].isPressed) or (in_mods and not MODS[mod].isPressed) then
+        if (not in_mods and MODS[kc_mod].isPressed) or (in_mods and not MODS[kc_mod].isPressed) then
             ret  = false
             break
         end
