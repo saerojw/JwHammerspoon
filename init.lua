@@ -1,42 +1,33 @@
-require "utils"
+require 'utils'
 
 local function monitor(keycode, state)
     if MONITORING then
         if MONITORING['stroke'] then
             local pressed_mods = {}
             for _, kc_mod in ipairs(MODS.keycodes) do
-                if MODS[kc_mod].isPressed then
+                if MODS.pressed(kc_mod) then
                     table.insert(pressed_mods, kc_mod)
                 end
             end
-            check('\t\t\t', pressed_mods, keycode, state)
+            check('\t', pressed_mods, keycode, state)
         end
         if MONITORING['mods'] then
-            local M, S = 5, 12
-            print('\t\t\t +-'..string.rep('-', M)..'-+-'..string.rep('-', S)..'-+-'..string.rep('-', S)..'-+')
-            for _, mod in ipairs({'cmd', 'ctrl', 'alt', 'shift'}) do
-                local L_state = MODS.get_state(mod)
-                local R_state = MODS.get_state('right'..mod)
-                print('\t\t\t | '
-                    ..mod..string.rep(' ', M-string.len(mod))..' | '
-                    ..L_state..string.rep(' ', S-string.len(L_state))..' | '
-                    ..R_state..string.rep(' ', S-string.len(R_state))..' |')
-            end
-            print('\t\t\t +-'..string.rep('-', M)..'-+-'..string.rep('-', S)..'-+-'..string.rep('-', S)..'-+')
+            MODS.state()
         end
     end
 end
 
 
 -- enter hammerspoon mode by shortcut
+hyper = {'cmd', 'ctrl', 'alt', 'shift'}
 MONITORING = {['stroke']=false, ['mods']=false}
 HS_MODE = {activated=false,
     hs.hotkey.new({}, 'r', hs.reload),
     hs.hotkey.new({}, 's', function() MONITORING['stroke']=not MONITORING['stroke'] end),
     hs.hotkey.new({}, 'm', function() MONITORING['mods']=not MONITORING['mods'] end)
 }
-hs.hotkey.bind({'cmd', 'ctrl', 'alt', 'shift'}, 'h',
-    function() -- get only one stroke; escape script is in "keyUp_event"
+hs.hotkey.bind(hyper, 'h',
+    function() -- get only one stroke; escape script is in 'keyUp_event'
         hs.application.launchOrFocus('Hammerspoon') -- open console
         hs.alert.show('      Hammerspoon mode\n'
                       ..'\n'
@@ -50,43 +41,58 @@ hs.hotkey.bind({'cmd', 'ctrl', 'alt', 'shift'}, 'h',
     end
 )
 
-require "remapping"
--- remap(src_mods, src_key, keyStroke([tgt_mods,] tgt_key))
--- remap_ex(src_mods, src_key, keyStroke, {[tgt_mods,] tgt_key}, modsConcat, options)
--- "remap" is operatig with a pressed hotkey and is repeated.
--- "remap_ex" extends "mods" to include combinations of "options" called "opt_mods".
--- "modsConcat" concatenates "opt_mods" with "mods" for "keyStroke".
-remap({'ctrl'}, 'delete', keyStroke('forwarddelete'))
-
--- RightControlHotkeys
-RCH = {}
-for arrw, src in pairs({up='i', left='j', down='k', right='l'}) do
-    RCH = concat(RCH, remap_ex({'ctrl'}, src, keyStroke, {arrw}, modsConcat, {'shift'}))
-end
-RCH = concat(RCH, remap_ex({'ctrl'}, 'b', keyStroke, {{'alt'}, 'left'}, modsConcat, {'shift'}))
-RCH = concat(RCH, remap_ex({'ctrl'}, 'f', keyStroke, {{'alt'}, 'right'}, modsConcat, {'shift'}))
-RCH = concat(RCH, remap_ex({'ctrl'}, 'p', keyStroke, {'pageup'}, modsConcat, {'shift'}))
-RCH = concat(RCH, remap_ex({'ctrl'}, 'n', keyStroke, {'pagedown'}, modsConcat, {'shift'}))
-for _, hotkey in ipairs(RCH) do
-    hotkey:disable()
-end
-
-
 -- 'capslock' is replaced with 'rightctrl' (System Preference > Keyboard > Keyboard > Modifier Keys).
 -- disable 'Use the CapsLock key to switch to and from U.S.' (System Preference > Keyboard > Input Sources)
-require "capslock"
-hs.hotkey.bind({'shift'}, 'space', toggle_capslock_with_alert)
+require 'capslock'
+require 'language'
+require 'remapping' -- get hotkey condition table 'HK_CONDS'
+hs.fnutils.each({
+-- {cond_kc_mods, src_key, tgt_kc_mods, tgt_key, expand_kc_mods}
+    {{'ctrl'},      'delete', {},      'forwarddelete', {}},
+    {{'rightctrl'}, '1',      {},      '!',             {}},
+    {{'rightctrl'}, '2',      {},      '@',             {}},
+    {{'rightctrl'}, '3',      {},      '#',             {}},
+    {{'rightctrl'}, '4',      {},      '$',             {}},
+    {{'rightctrl'}, '5',      {},      '%',             {}},
+    {{'rightctrl'}, '6',      {},      '^',             {}},
+    {{'rightctrl'}, '7',      {},      '&',             {}},
+    {{'rightctrl'}, '8',      {},      '*',             {}},
+    {{'rightctrl'}, '9',      {},      '(',             {}},
+    {{'rightctrl'}, '0',      {},      ')',             {}},
+    {{'rightctrl'}, '-',      {},      '_',             {}},
+    {{'rightctrl'}, '=',      {},      '+',             {}},
+    {{'rightctrl'}, '\\',     {},      '|',             {}},
+    {{'rightctrl'}, ';',      {},      ':',             {}},
+    {{'rightctrl'}, "'",      {},      '"',             {}},
+    {{'rightctrl'}, 'e',      {},      'end',           {'shift'}},
+    {{'rightctrl'}, 'i',      {},      'up',            {'cmd', 'shift'}},
+{{'alt', 'rightctrl'}, 'i',   {'alt'}, 'up',            {'shift'}},
+    {{'rightctrl'}, 'p',      {},      'pageup',        {'shift'}},
+    {{'rightctrl'}, 'a',      {},      'home',          {'shift'}},
+    {{'rightctrl'}, 's',      {},      'space',         {}},
+    {{'rightctrl'}, 'd',      {},      'forwarddelete', {}},
+    {{'rightctrl'}, 'f',      {'alt'}, 'right',         {'shift'}},
+    {{'rightctrl'}, 'g',      {},      'return',        {}},
+    {{'rightctrl'}, 'h',      {},      'delete',        {}},
+    {{'rightctrl'}, 'j',      {},      'left',          {'cmd', 'shift'}},
+{{'alt', 'rightctrl'}, 'j',   {'alt'}, 'left',          {'shift'}},
+    {{'rightctrl'}, 'k',      {},      'down',          {'cmd', 'shift'}},
+{{'alt', 'rightctrl'}, 'k',   {'alt'}, 'down',          {'shift'}},
+    {{'rightctrl'}, 'l',      {},      'right',         {'cmd', 'shift'}},
+{{'alt', 'rightctrl'}, 'l',   {'alt'}, 'right',         {'shift'}},
+    {{'rightctrl'}, 'b',      {'alt'}, 'left',          {'shift'}},
+    {{'rightctrl'}, 'n',      {},      'pagedown',      {'shift'}},
+-- {cond_kc_mods, src_key, pressedfn, releasedfn, repeatfn}
+    {{},            'kana',  function() toggle_language('Korean', 'English') end},
+    {{'leftctrl'},  'space', function() toggle_language('Korean', 'English') end},
+    {{'shift'},     'space', toggle_capslock_with_alert}
+    }, function(args) remap(table.unpack(args)) end
+)
 
 
--- This code can distinguish between 'mod'(leftmod) and 'rightmod'.
-require "language"
-hs.hotkey.bind({'ctrl'}, 'space', function() end)
-
-
-iTerm2 = false
 function applicationWatcher(appName, eventType, appObject)
     if (eventType == hs.application.watcher.activated) then
-        if (appName == "iTerm2") then
+        if (appName == 'iTerm2') then
             iTerm2 = true
         else
             iTerm2 = false
@@ -96,35 +102,49 @@ end
 appWatcher = hs.application.watcher.new(applicationWatcher)
 appWatcher:start()
 
+function add_enable_cond(hotkey)
+    local enable = true
+    enable = enable and not (iTerm2 and (hotkey['idx']=='⌃B' or hotkey['idx']=='⌃F'))
+    return enable
+end
 
-require "separate_mods"
-MODS = separated_mods_FLAGS()
+
+MODS = require('separate_mods')
 modChange_event = hs.eventtap.new(
     {hs.eventtap.event.types.flagsChanged},
     function (event)
         local keycode = MODS.update(event)
         monitor(keaycode)
 
-        -- set English by tapping 'rightctrl'
-        if MODS.condition(keycode, 'rightctrl', 'tapped') then
-            set_language('English')
-        end
-
-        if keycode=='rightctrl' then
-            if MODS['rightctrl'].isPressed then
-                for _, hotkey in ipairs(RCH) do
-                    hotkey:enable()
-                    if iTerm2 and (hotkey['msg']=='⌃B' or hotkey['msg']=='⌃F') then
-                        hotkey:disable()
+        for hk_cond_id, hotkeys in pairs(HK_CONDS) do
+            local hk_cond = {}
+            for cond in string.gmatch(hk_cond_id, '[^%s]+') do
+                table.insert(hk_cond, cond)
+            end
+            if MODS.pressedExactly(hk_cond) then
+                for _, hotkey in ipairs(hotkeys) do
+                    if hotkey.enabled then
+                        if not add_enable_cond(hotkey) then
+                            hotkey:disable()
+                        end
+                    elseif add_enable_cond(hotkey) then
+                        hotkey:enable()
                     end
                 end
             else
-                for _, hotkey in ipairs(RCH) do
-                    hotkey:disable()
+                for _, hotkey in ipairs(hotkeys) do
+                    if hotkey.enabled then
+                        hotkey:disable()
+                    end
                 end
             end
         end
-        if MODS[keycode]~=nil and not MODS[keycode].isPressed then
+        if MODS.match(keycode, 'rightctrl', 'tapped') then
+            set_language('English')
+        elseif MODS.match(keycode, 'leftshift', 'tapped') then
+            set_language('Korean')
+        end
+        if MODS[keycode]~=nil and not MODS.pressed(keycode) then
             MODS.reset()
         end
     end
@@ -153,14 +173,6 @@ keyUp_event = hs.eventtap.new(
     function (event)
         local keycode = MODS.update(event)
         monitor(keycode, 'released')
-
-        -- set Korean with 'rightctrl' + 'space'
-        if keycode=='space' and MODS['rightctrl'].isPressed then
-            set_language('Korean')
-        -- toggle Korean/English with '(logitech)Fn' + space or '(left)ctrl' + space
-        elseif keycode=='kana' or (keycode=='space' and MODS.pressedExactly({'ctrl'})) then
-            toggle_language('Korean', 'English')
-        end
 
         -- record last stroke
         LAST_STROKE = keycode

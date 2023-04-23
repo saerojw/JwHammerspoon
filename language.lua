@@ -1,5 +1,5 @@
-local language = {['Korean']='com.apple.inputmethod.Korean.2SetKorean',
-                  ['English']='com.apple.keylayout.ABC'}
+local language = {["Korean"]="com.apple.inputmethod.Korean.2SetKorean",
+                  ["English"]="com.apple.keylayout.ABC"}
 
 
 function set_language(lan)
