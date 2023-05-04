@@ -188,3 +188,13 @@ keyUp_event = hs.eventtap.new(
     end
 )
 keyUp_event:start()
+
+mouse_event = hs.eventtap.new(
+    {hs.eventtap.event.types.leftMouseDown},
+    function (event)
+        if MODS.pressedAny(hyper) then
+            MODS.reset()
+        end
+    end
+)
+mouse_event:start()
