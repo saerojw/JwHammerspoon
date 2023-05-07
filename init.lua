@@ -116,6 +116,11 @@ modChange_event = hs.eventtap.new(
         local keycode = MODS.update(event)
         monitor(keaycode)
 
+        if MODS.pressedExactly({"leftshift"}) then
+            t_LShiftDown = hs.timer.absoluteTime()
+        end
+        local t_LShiftPressed = (hs.timer.absoluteTime() - t_LShiftDown) / 1000000 -- ms
+
         for hk_cond_id, hotkeys in pairs(HK_CONDS) do
             local hk_cond = {}
             for cond in string.gmatch(hk_cond_id, '[^%s]+') do
@@ -139,9 +144,10 @@ modChange_event = hs.eventtap.new(
                 end
             end
         end
+
         if MODS.match(keycode, 'rightctrl', 'tapped') then
             set_language('English')
-        elseif MODS.match(keycode, 'leftshift', 'tapped') then
+        elseif MODS.match(keycode, 'leftshift', 'tapped') and t_LShiftPressed<500 then
             set_language('Korean')
         end
         if MODS[keycode]~=nil and not MODS.pressed(keycode) then
