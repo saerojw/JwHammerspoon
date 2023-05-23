@@ -46,44 +46,45 @@ hs.hotkey.bind(hyper, 'h',
 require 'capslock'
 require 'language'
 require 'remapping' -- get hotkey condition table 'HK_CONDS'
+hs.hotkey.setLogLevel(2.5) -- default=3
 hs.fnutils.each({
 -- {cond_kc_mods, src_key, tgt_kc_mods, tgt_key, expand_kc_mods}
-    {{'ctrl'},      'delete', {},      'forwarddelete', {}},
-    {{'rightctrl'}, '1',      {},      '!',             {}},
-    {{'rightctrl'}, '2',      {},      '@',             {}},
-    {{'rightctrl'}, '3',      {},      '#',             {}},
-    {{'rightctrl'}, '4',      {},      '$',             {}},
-    {{'rightctrl'}, '5',      {},      '%',             {}},
-    {{'rightctrl'}, '6',      {},      '^',             {}},
-    {{'rightctrl'}, '7',      {},      '&',             {}},
-    {{'rightctrl'}, '8',      {},      '*',             {}},
-    {{'rightctrl'}, '9',      {},      '(',             {}},
-    {{'rightctrl'}, '0',      {},      ')',             {}},
-    {{'rightctrl'}, '-',      {},      '_',             {}},
-    {{'rightctrl'}, '=',      {},      '+',             {}},
-    {{'ctrl'},      '[',      {'cmd'}, '[',             {}},
-    {{'ctrl'},      ']',      {'cmd'}, ']',             {}},
-    {{'rightctrl'}, '\\',     {},      '|',             {}},
-    {{'rightctrl'}, ';',      {},      ':',             {}},
-    {{'rightctrl'}, "'",      {},      '"',             {}},
-    {{'rightctrl'}, 'e',      {},      'end',           {'shift'}},
-    {{'rightctrl'}, 'i',      {},      'up',            {'cmd', 'shift'}},
-{{'alt', 'rightctrl'}, 'i',   {'alt'}, 'up',            {'shift'}},
-    {{'rightctrl'}, 'p',      {},      'pageup',        {'shift'}},
-    {{'rightctrl'}, 'a',      {},      'home',          {'shift'}},
-    {{'rightctrl'}, 's',      {},      'space',         {}},
-    {{'rightctrl'}, 'd',      {},      'forwarddelete', {}},
-    {{'rightctrl'}, 'f',      {'alt'}, 'right',         {'shift'}},
-    {{'rightctrl'}, 'g',      {},      'return',        {}},
-    {{'rightctrl'}, 'h',      {},      'delete',        {}},
-    {{'rightctrl'}, 'j',      {},      'left',          {'cmd', 'shift'}},
-{{'alt', 'rightctrl'}, 'j',   {'alt'}, 'left',          {'shift'}},
-    {{'rightctrl'}, 'k',      {},      'down',          {'cmd', 'shift'}},
-{{'alt', 'rightctrl'}, 'k',   {'alt'}, 'down',          {'shift'}},
-    {{'rightctrl'}, 'l',      {},      'right',         {'cmd', 'shift'}},
-{{'alt', 'rightctrl'}, 'l',   {'alt'}, 'right',         {'shift'}},
-    {{'rightctrl'}, 'b',      {'alt'}, 'left',          {'shift'}},
-    {{'rightctrl'}, 'n',      {},      'pagedown',      {'shift'}},
+        {{'ctrl'},      'delete', {},        'forwarddelete', {}},
+        {{'rightctrl'}, '1',      {'shift'}, '1',             {}},
+        {{'rightctrl'}, '2',      {'shift'}, '2',             {}},
+        {{'rightctrl'}, '3',      {'shift'}, '3',             {}},
+        {{'rightctrl'}, '4',      {'shift'}, '4',             {}},
+        {{'rightctrl'}, '5',      {'shift'}, '5',             {}},
+        {{'rightctrl'}, '6',      {'shift'}, '6',             {}},
+        {{'rightctrl'}, '7',      {'shift'}, '7',             {}},
+        {{'rightctrl'}, '8',      {'shift'}, '8',             {}},
+        {{'rightctrl'}, '9',      {'shift'}, '9',             {}},
+        {{'rightctrl'}, '0',      {'shift'}, '0',             {}},
+        {{'rightctrl'}, '-',      {'shift'}, '-',             {}},
+        {{'rightctrl'}, '=',      {'shift'}, '=',             {}},
+        {{'ctrl'},      '[',      {'cmd'},   '[',             {}},
+        {{'ctrl'},      ']',      {'cmd'},   ']',             {}},
+        {{'rightctrl'}, '\\',     {'shift'}, '\\',            {}},
+        {{'rightctrl'}, ';',      {'shift'}, ';',             {}},
+        {{'rightctrl'}, "'",      {'shift'}, "'",             {}},
+        {{'rightctrl'}, 'e',      {},        'end',           {'shift'}},
+        {{'rightctrl'}, 'i',      {},        'up',            {'cmd', 'shift'}},
+{{'alt', 'rightctrl'},  'i',      {'alt'},   'up',            {'shift'}},
+        {{'rightctrl'}, 'p',      {},        'pageup',        {'shift'}},
+        {{'rightctrl'}, 'a',      {},        'home',          {'shift'}},
+        {{'rightctrl'}, 's',      {},        'space',         {}},
+        {{'rightctrl'}, 'd',      {},        'forwarddelete', {}},
+        {{'rightctrl'}, 'f',      {'alt'},   'right',         {'shift'}},
+        {{'rightctrl'}, 'g',      {},        'return',        {}},
+        {{'rightctrl'}, 'h',      {},        'delete',        {}},
+        {{'rightctrl'}, 'j',      {},        'left',          {'cmd', 'shift'}},
+{{'alt', 'rightctrl'},  'j',      {'alt'},   'left',          {'shift'}},
+        {{'rightctrl'}, 'k',      {},        'down',          {'cmd', 'shift'}},
+{{'alt', 'rightctrl'},  'k',      {'alt'},   'down',          {'shift'}},
+        {{'rightctrl'}, 'l',      {},        'right',         {'cmd', 'shift'}},
+{{'alt', 'rightctrl'},  'l',      {'alt'},   'right',         {'shift'}},
+        {{'rightctrl'}, 'b',      {'alt'},   'left',          {'shift'}},
+        {{'rightctrl'}, 'n',      {},        'pagedown',      {'shift'}},
 -- {cond_kc_mods, src_key, pressedfn, releasedfn, repeatfn}
     {{},            'kana',  function() toggle_language('Korean', 'English') end},
     {{'leftctrl'},  'space', function() toggle_language('Korean', 'English') end},
@@ -112,6 +113,7 @@ end
 
 
 MODS = require('separate_mods')
+t_LShiftDown = 0
 modChange_event = hs.eventtap.new(
     {hs.eventtap.event.types.flagsChanged},
     function (event)
@@ -149,7 +151,7 @@ modChange_event = hs.eventtap.new(
 
         if MODS.match(keycode, 'rightctrl', 'tapped') then
             set_language('English')
-        elseif MODS.match(keycode, 'leftshift', 'tapped') and t_LShiftPressed<500 then
+        elseif MODS.match(keycode, 'leftshift', 'tapped') and t_LShiftPressed<200 then
             set_language('Korean')
         end
         if MODS[keycode]~=nil and not MODS.pressed(keycode) then
