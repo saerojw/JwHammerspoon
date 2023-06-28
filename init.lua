@@ -67,24 +67,24 @@ hs.fnutils.each({
         {{'rightctrl'}, '\\',     {'shift'}, '\\',            {}},
         {{'rightctrl'}, ';',      {'shift'}, ';',             {}},
         {{'rightctrl'}, "'",      {'shift'}, "'",             {}},
-        {{'rightctrl'}, 'e',      {},        'end',           {'shift'}},
-        {{'rightctrl'}, 'i',      {},        'up',            {'cmd', 'shift'}},
-{{'alt', 'rightctrl'},  'i',      {'alt'},   'up',            {'shift'}},
-        {{'rightctrl'}, 'p',      {},        'pageup',        {'shift'}},
         {{'rightctrl'}, 'a',      {},        'home',          {'shift'}},
-        {{'rightctrl'}, 's',      {},        'space',         {}},
+        {{'rightctrl'}, 'b',      {'alt'},   'left',          {'shift'}},
         {{'rightctrl'}, 'd',      {},        'forwarddelete', {}},
+        {{'rightctrl'}, 'e',      {},        'end',           {'shift'}},
         {{'rightctrl'}, 'f',      {'alt'},   'right',         {'shift'}},
         {{'rightctrl'}, 'g',      {},        'return',        {}},
         {{'rightctrl'}, 'h',      {},        'delete',        {}},
+        {{'rightctrl'}, 'i',      {},        'up',            {'cmd', 'shift'}},
+{{'alt', 'rightctrl'},  'i',      {'alt'},   'up',            {'shift'}},
         {{'rightctrl'}, 'j',      {},        'left',          {'cmd', 'shift'}},
 {{'alt', 'rightctrl'},  'j',      {'alt'},   'left',          {'shift'}},
         {{'rightctrl'}, 'k',      {},        'down',          {'cmd', 'shift'}},
 {{'alt', 'rightctrl'},  'k',      {'alt'},   'down',          {'shift'}},
         {{'rightctrl'}, 'l',      {},        'right',         {'cmd', 'shift'}},
 {{'alt', 'rightctrl'},  'l',      {'alt'},   'right',         {'shift'}},
-        {{'rightctrl'}, 'b',      {'alt'},   'left',          {'shift'}},
         {{'rightctrl'}, 'n',      {},        'pagedown',      {'shift'}},
+        {{'rightctrl'}, 'p',      {},        'pageup',        {'shift'}},
+        {{'rightctrl'}, 's',      {},        'space',         {}},
 -- {cond_kc_mods, src_key, pressedfn, releasedfn, repeatfn}
     {{},            'kana',  function() toggle_language('Korean', 'English') end},
     {{'leftctrl'},  'space', function() toggle_language('Korean', 'English') end},
@@ -95,11 +95,8 @@ hs.fnutils.each({
 
 function applicationWatcher(appName, eventType, appObject)
     if (eventType == hs.application.watcher.activated) then
-        if (appName == 'iTerm2') then
-            iTerm2 = true
-        else
-            iTerm2 = false
-        end
+        iTerm2 = (appName == 'iTerm2')
+        browser = (appName == 'Google Chrome') or (appName == 'Safari')
     end
 end
 appWatcher = hs.application.watcher.new(applicationWatcher)
@@ -108,6 +105,7 @@ appWatcher:start()
 function add_enable_cond(hotkey)
     local enable = true
     enable = enable and not (iTerm2 and (hotkey['idx']=='⌃B' or hotkey['idx']=='⌃F'))
+    enable = enable and not (browser and (hotkey['idx']=='⌃A' or hotkey['idx']=='⌃E'))
     return enable
 end
 
