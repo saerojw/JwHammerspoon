@@ -67,10 +67,10 @@ hs.fnutils.each({
         {{'rightctrl'}, '\\',     {'shift'}, '\\',            {}},
         {{'rightctrl'}, ';',      {'shift'}, ';',             {}},
         {{'rightctrl'}, "'",      {'shift'}, "'",             {}},
-        {{'rightctrl'}, 'a',      {},        'home',          {'shift'}},
+        -- {{'rightctrl'}, 'a',      {},        'home',          {'shift'}},
         {{'rightctrl'}, 'b',      {'alt'},   'left',          {'shift'}},
         {{'rightctrl'}, 'd',      {},        'forwarddelete', {}},
-        {{'rightctrl'}, 'e',      {},        'end',           {'shift'}},
+        -- {{'rightctrl'}, 'e',      {},        'end',           {'shift'}},
         {{'rightctrl'}, 'f',      {'alt'},   'right',         {'shift'}},
         {{'rightctrl'}, 'g',      {},        'return',        {}},
         {{'rightctrl'}, 'h',      {},        'delete',        {}},
@@ -105,7 +105,7 @@ appWatcher:start()
 function add_enable_cond(hotkey)
     local enable = true
     enable = enable and not (iTerm2 and (hotkey['idx']=='⌃B' or hotkey['idx']=='⌃F'))
-    enable = enable and not (browser and (hotkey['idx']=='⌃A' or hotkey['idx']=='⌃E'))
+    -- enable = enable and not (browser and (hotkey['idx']=='⌃A' or hotkey['idx']=='⌃E'))
     return enable
 end
 
