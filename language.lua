@@ -1,6 +1,10 @@
 local language = {["Korean"]="com.apple.inputmethod.Korean.2SetKorean",
                   ["English"]="com.apple.keylayout.ABC"}
 
+function is_language(lan)
+    return hs.keycodes.currentSourceID()==language[lan]
+end
+
 
 function set_language(lan)
     hs.keycodes.currentSourceID(language[lan])
