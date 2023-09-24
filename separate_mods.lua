@@ -111,7 +111,7 @@ end
 
 
 function MODS.match(keycode, kc_mod, state)
-    if string.find(kc_mod, 'left') then
+    if string.find(kc_mod, 'left') and not (keycode == nil) then
         keycode = 'left'..keycode
     end
     return keycode==kc_mod and getState(kc_mod)==state
