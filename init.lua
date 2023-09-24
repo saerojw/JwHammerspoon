@@ -67,10 +67,10 @@ hs.fnutils.each({
         {{'rightctrl'}, '\\',     {'shift'}, '\\',            {}},
         {{'rightctrl'}, ';',      {'shift'}, ';',             {}},
         {{'rightctrl'}, "'",      {'shift'}, "'",             {}},
-        {{'rightctrl'}, 'a',      {},        'home',          {'shift'}},
+        -- {{'rightctrl'}, 'a',      {},        'home',          {'shift'}},
         {{'rightctrl'}, 'b',      {'alt'},   'left',          {'shift'}},
         {{'rightctrl'}, 'd',      {},        'forwarddelete', {}},
-        {{'rightctrl'}, 'e',      {},        'end',           {'shift'}},
+        -- {{'rightctrl'}, 'e',      {},        'end',           {'shift'}},
         {{'rightctrl'}, 'f',      {'alt'},   'right',         {'shift'}},
         {{'rightctrl'}, 'g',      {},        'return',        {}},
         {{'rightctrl'}, 'h',      {},        'delete',        {}},
@@ -96,7 +96,7 @@ hs.fnutils.each({
 function applicationWatcher(appName, eventType, appObject)
     if (eventType == hs.application.watcher.activated) then
         iTerm2 = (appName == 'iTerm2')
-        browser = (appName == 'Google Chrome') or (appName == 'Safari')
+        -- browser = (appName == 'Google Chrome') or (appName == 'Safari')
     end
 end
 appWatcher = hs.application.watcher.new(applicationWatcher)
@@ -113,8 +113,8 @@ function disable_cond(hotkey)
     local disable = false
     if hotkey_cond(hotkey, {'⌃B', '⌃F'}) then
         disable = iTerm2
-    elseif hotkey_cond(hotkey, {'⌃A', '⌃E'}) then
-        disable = (not browser) or (browser and not is_language('Korean'))
+    -- elseif hotkey_cond(hotkey, {'⌃A', '⌃E'}) then
+    --     disable = (not browser) or (browser and not is_language('Korean'))
     end
     return disable
 end
@@ -159,7 +159,7 @@ modChange_event = hs.eventtap.new(
 
         if MODS.match(keycode, 'rightctrl', 'tapped') then
             set_language('English')
-        elseif MODS.match(keycode, 'leftshift', 'tapped') and t_LShiftPressed<200 then
+        elseif MODS.match(keycode, 'leftshift', 'tapped') and t_LShiftPressed<150 then
             set_language('Korean')
         end
         if MODS[keycode]~=nil and not MODS.pressed(keycode) then
@@ -180,6 +180,10 @@ keyDown_event = hs.eventtap.new(
         -- This should be useful for Korean vim users.
         if keycode==';' and LAST_STROKE=='escape' then
             set_language('English')
+        -- Sometimes, ^a and ^e not working when language is Korean
+        elseif (keycode=='a' or keycode=='e') and is_language('Korean') and MODS.pressedExactly({"rightctrl"}) then
+            set_language('English')
+            ae_toggle_lan = true
         end
     end
 )
@@ -192,15 +196,19 @@ keyUp_event = hs.eventtap.new(
         local keycode = MODS.update(event)
         monitor(keycode, 'released')
 
-        -- record last stroke
+        -- Record last stroke
         LAST_STROKE = keycode
-        -- escape from hammerspoon mode
+        -- Escape from hammerspoon mode
         if HS_MODE.activated and keycode~='h' then
             for _, hotkey in ipairs(HS_MODE) do
                 hotkey:disable()
             end
             hs.alert.closeAll()
             HS_MODE.activated = false
+        -- Restore language setting for ^a and ^e
+        elseif (keycode=='a' or keycode=='e') and ae_toggle_lan then
+            set_language('Korean')
+            ae_toggle_lan = false
         end
 
     end
