@@ -7,14 +7,18 @@ end
 
 
 function set_language(lan)
+    if lan=="Korean" then
+        hs.keycodes.currentSourceID(language["English"])
+        hs.keycodes.currentSourceID(language["English"])
+    end
     hs.keycodes.currentSourceID(language[lan])
 end
 
 
 function toggle_language(lan1, lan2)
     if hs.keycodes.currentSourceID()==language[lan1] then
-        hs.keycodes.currentSourceID(language[lan2])
-    else
-        hs.keycodes.currentSourceID(language[lan1])
+        set_language(lan2)
+    elseif hs.keycodes.currentSourceID()==language[lan2] then
+        set_language(lan1)
     end
 end
