@@ -50,27 +50,15 @@ hs.hotkey.setLogLevel(2.5) -- default=3
 hs.fnutils.each({
 -- {cond_kc_mods, src_key, tgt_kc_mods, tgt_key, expand_kc_mods}
         {{'ctrl'},      'delete', {},        'forwarddelete', {}},
-        {{'rightctrl'}, '1',      {'shift'}, '1',             {}},
-        {{'rightctrl'}, '2',      {'shift'}, '2',             {}},
-        {{'rightctrl'}, '3',      {'shift'}, '3',             {}},
-        {{'rightctrl'}, '4',      {'shift'}, '4',             {}},
-        {{'rightctrl'}, '5',      {'shift'}, '5',             {}},
-        {{'rightctrl'}, '6',      {'shift'}, '6',             {}},
-        {{'rightctrl'}, '7',      {'shift'}, '7',             {}},
-        {{'rightctrl'}, '8',      {'shift'}, '8',             {}},
-        {{'rightctrl'}, '9',      {'shift'}, '9',             {}},
-        {{'rightctrl'}, '0',      {'shift'}, '0',             {}},
-        {{'rightctrl'}, '-',      {'shift'}, '-',             {}},
-        {{'rightctrl'}, '=',      {'shift'}, '=',             {}},
         {{'ctrl'},      '[',      {'cmd'},   '[',             {}},
         {{'ctrl'},      ']',      {'cmd'},   ']',             {}},
         {{'rightctrl'}, '\\',     {'shift'}, '\\',            {}},
         {{'rightctrl'}, ';',      {'shift'}, ';',             {}},
         {{'rightctrl'}, "'",      {'shift'}, "'",             {}},
-        -- {{'rightctrl'}, 'a',      {},        'home',          {'shift'}},
+        {{'rightctrl'}, 'a',      {},        'home',          {'shift'}},
         {{'rightctrl'}, 'b',      {'alt'},   'left',          {'shift'}},
         {{'rightctrl'}, 'd',      {},        'forwarddelete', {}},
-        -- {{'rightctrl'}, 'e',      {},        'end',           {'shift'}},
+        {{'rightctrl'}, 'e',      {},        'end',           {'shift'}},
         {{'rightctrl'}, 'f',      {'alt'},   'right',         {'shift'}},
         {{'rightctrl'}, 'g',      {},        'return',        {}},
         {{'rightctrl'}, 'h',      {},        'delete',        {}},
@@ -96,7 +84,7 @@ hs.fnutils.each({
 function applicationWatcher(appName, eventType, appObject)
     if (eventType == hs.application.watcher.activated) then
         iTerm2 = (appName == 'iTerm2')
-        -- browser = (appName == 'Google Chrome') or (appName == 'Safari')
+        MSoffice = (appName == 'Microsoft Word' or appName == 'Microsoft Excel' or appName == 'Microsoft PowerPoint')
     end
 end
 appWatcher = hs.application.watcher.new(applicationWatcher)
@@ -111,10 +99,10 @@ function disable_cond(hotkey)
         return cond
     end
     local disable = false
-    if hotkey_cond(hotkey, {'⌃B', '⌃F'}) then
+    if hotkey_cond(hotkey, {'⌃A', '⌃E'}) then
+        disable = (not MSoffice)
+    elseif hotkey_cond(hotkey, {'⌃B', '⌃F'}) then
         disable = iTerm2
-    -- elseif hotkey_cond(hotkey, {'⌃A', '⌃E'}) then
-    --     disable = (not browser) or (browser and not is_language('Korean'))
     end
     return disable
 end
@@ -159,7 +147,7 @@ modChange_event = hs.eventtap.new(
 
         if MODS.match(keycode, 'rightctrl', 'tapped') then
             set_language('English')
-        elseif MODS.match(keycode, 'leftshift', 'tapped') and t_LShiftPressed<150 then
+        elseif MODS.match(keycode, 'leftshift', 'tapped') and t_LShiftPressed<200 then
             set_language('Korean')
         end
         if MODS[keycode]~=nil and not MODS.pressed(keycode) then
