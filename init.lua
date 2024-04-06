@@ -56,11 +56,11 @@ hs.fnutils.each({
         {{'rightctrl'}, ';',      {'shift'}, ';',             {}},
         {{'rightctrl'}, "'",      {'shift'}, "'",             {}},
         {{'rightctrl'}, 'a',      {},        'home',          {'shift'}},
-        {{'rightctrl'}, 'b',      {'alt'},   'left',          {'shift'}},
+{{'cmd', 'rightctrl'},  'b',      {'alt'},   'left',          {'shift'}},
         {{'rightctrl'}, 'd',      {},        'forwarddelete', {}},
         {{'rightctrl'}, 'e',      {},        'end',           {'shift'}},
-        {{'rightctrl'}, 'f',      {'alt'},   'right',         {'shift'}},
-        {{'rightctrl'}, 'g',      {},        'return',        {}},
+{{'cmd', 'rightctrl'},  'f',      {'alt'},   'right',         {'shift'}},
+        {{'rightctrl'}, 'g',      {},        'return',        hyper},
         {{'rightctrl'}, 'h',      {},        'delete',        {}},
         {{'rightctrl'}, 'i',      {},        'up',            {'cmd', 'shift'}},
 {{'alt', 'rightctrl'},  'i',      {'alt'},   'up',            {'shift'}},
@@ -72,7 +72,6 @@ hs.fnutils.each({
 {{'alt', 'rightctrl'},  'l',      {'alt'},   'right',         {'shift'}},
         {{'rightctrl'}, 'n',      {},        'pagedown',      {'shift'}},
         {{'rightctrl'}, 'p',      {},        'pageup',        {'shift'}},
-        {{'rightctrl'}, 's',      {},        'space',         {}},
 -- {cond_kc_mods, src_key, pressedfn, releasedfn, repeatfn}
     {{},            'kana',  function() toggle_language('Korean', 'English') end},
     {{'leftctrl'},  'space', function() toggle_language('Korean', 'English') end},
@@ -85,6 +84,7 @@ function applicationWatcher(appName, eventType, appObject)
     if (eventType == hs.application.watcher.activated) then
         iTerm2 = (appName == 'iTerm2')
         MSoffice = (appName == 'Microsoft Word' or appName == 'Microsoft Excel' or appName == 'Microsoft PowerPoint')
+        vscode = (appName == 'Code')
     end
 end
 appWatcher = hs.application.watcher.new(applicationWatcher)
@@ -98,10 +98,11 @@ function disable_cond(hotkey)
         end
         return cond
     end
+    --
     local disable = false
     if hotkey_cond(hotkey, {'⌃A', '⌃E'}) then
-        disable = (not MSoffice)
-    elseif hotkey_cond(hotkey, {'⌃B', '⌃F'}) then
+        disable = not (MSoffice or vscode)
+    elseif hotkey_cond(hotkey, {'⌘⌃B', '⌘⌃F'}) then
         disable = iTerm2
     end
     return disable
