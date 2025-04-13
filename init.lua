@@ -84,7 +84,7 @@ hs.fnutils.each({
 
 function applicationWatcher(appName, eventType, appObject)
     if (eventType == hs.application.watcher.activated) then
-        iTerm2 = (appName == 'iTerm2')
+        -- iTerm2 = (appName == 'iTerm2')
         MSoffice = (appName == 'Microsoft Word' or appName == 'Microsoft Excel' or appName == 'Microsoft PowerPoint')
         vscode = (appName == 'Code')
     end
@@ -104,8 +104,8 @@ function disable_cond(hotkey)
     local disable = false
     if hotkey_cond(hotkey, {'⌃A', '⌃E'}) then
         disable = not (MSoffice or vscode)
-    elseif hotkey_cond(hotkey, {'⌘⌃B', '⌘⌃F'}) then
-        disable = iTerm2
+    -- elseif hotkey_cond(hotkey, {'⌘⌃B', '⌘⌃F'}) then
+    --     disable = iTerm2
     end
     return disable
 end
@@ -201,7 +201,6 @@ keyUp_event = hs.eventtap.new(
             set_language('Korean')
             ae_toggle_lan = false
         end
-
     end
 )
 keyUp_event:start()
