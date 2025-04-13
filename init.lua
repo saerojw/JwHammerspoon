@@ -215,11 +215,43 @@ keyUp_event = hs.eventtap.new(
 )
 keyUp_event:start()
 
+
+-- TODO feature
+-- CursorCorral = require('cursor_corral')
+leftMouseDown = false
+rightMouseDown = false
 mouse_event = hs.eventtap.new(
-    {hs.eventtap.event.types.leftMouseDown},
+    {hs.eventtap.event.types.leftMouseDown,
+     hs.eventtap.event.types.rightMouseDown,
+     hs.eventtap.event.types.leftMouseUp,
+     hs.eventtap.event.types.rightMouseUp},
     function (event)
-        if MODS.pressedAny(hyper) then
-            MODS.reset()
+        local button = event:getProperty(hs.eventtap.event.properties['mouseEventButtonNumber'])
+
+        if event:getType() == hs.eventtap.event.types.leftMouseDown then
+            leftMouseDown = true
+        elseif event:getType() == hs.eventtap.event.types.rightMouseDown then
+            rightMouseDown = true
+        elseif event:getType() == hs.eventtap.event.types.leftMouseUp then
+            leftMouseDown = false
+        elseif event:getType() == hs.eventtap.event.types.rightMouseUp then
+            rightMouseDown = false
+        end
+
+        if leftMouseDown and rightMouseDown then
+            -- if not hs.application.launchOrFocus("logioptionsplus") then
+            --     hs.alert.show("Fail to run Logi Options+")
+            -- end
+
+            -- if CursorCorral.isEnabled() then
+            --     CursorCorralEnabled = CursorCorral.disable()
+            -- else
+            --     CursorCorralEnabled = CursorCorral.enable()
+            -- end
+
+            leftMouseDown = false
+            rightMouseDown = false
+            return true
         end
     end
 )
