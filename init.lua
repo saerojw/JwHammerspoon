@@ -86,7 +86,7 @@ function applicationWatcher(appName, eventType, appObject)
     if (eventType == hs.application.watcher.activated) then
         -- iTerm2 = (appName == 'iTerm2')
         MSoffice = (appName == 'Microsoft Word' or appName == 'Microsoft Excel' or appName == 'Microsoft PowerPoint')
-        vscode = (appName == 'Code')
+        vscode = (appName == 'Code' or 'Cursor')
     end
 end
 appWatcher = hs.application.watcher.new(applicationWatcher)
