@@ -81,9 +81,7 @@ hs.fnutils.each({
     {{'rightctrl', 'shift'},    'p',        {'shift'},          'up',               {}},
     {{'rightctrl'},             'r',        {},                 'return',           {'cmd', 'alt', 'shift'}},
     {{'rightctrl', 'alt'},      'u',        {'alt'},            'up',               {}},
-    {{'rightctrl'},             'u',        {},                 'up',               {'shift'}},
-    {{'alt'},                   'u',        {},                 'pageup',           {'shift'}},
-    {{'cmd', 'alt'},            '`',        {'cmd', 'alt'},     'escape',           {}},
+    {{'leftcmd'},               'b',        {'ctrl'},           'b',                {}},
 -- {cond_kc_mods, src_key, pressedfn, releasedfn, repeatfn}
     {{},            'kana',     function() toggle_language('Korean', 'English') end},
     {{'leftctrl'},  'space',    function() toggle_language('Korean', 'English') end},
@@ -94,7 +92,8 @@ hs.fnutils.each({
 
 function applicationWatcher(appName, eventType, appObject)
     if (eventType == hs.application.watcher.activated) then
-        -- iTerm2 = (appName == 'iTerm2')
+        debug_print("App event:", appName)
+        iTerm2 = (appName == 'iTerm2')
         MSoffice = (appName == 'Microsoft Word' or appName == 'Microsoft Excel' or appName == 'Microsoft PowerPoint')
         vscode = (appName == 'Code' or appName == 'Cursor')
     end
@@ -114,8 +113,8 @@ function disable_cond(hotkey)
     local disable = false
     if hotkey_cond(hotkey, {'⌃A', '⌃E'}) then
         disable = not (MSoffice or vscode)
-    -- elseif hotkey_cond(hotkey, {'⌘⌃B', '⌘⌃F'}) then
-    --     disable = iTerm2
+    elseif hotkey_cond(hotkey, {'⌘B'}) then
+        disable = not iTerm2
     end
     return disable
 end
@@ -141,11 +140,11 @@ modChange_event = hs.eventtap.new(
             end
             if MODS.pressedExactly(hk_cond) then
                 for _, hotkey in ipairs(hotkeys) do
-                    if hotkey.enabled then
-                        if disable_cond(hotkey) then
+                    if disable_cond(hotkey) then
+                        if hotkey.enabled then
                             hotkey:disable()
                         end
-                    elseif not disable_cond(hotkey) then
+                    elseif not hotkey.enabled then
                         hotkey:enable()
                     end
                 end
