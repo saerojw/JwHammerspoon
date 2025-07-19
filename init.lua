@@ -1,5 +1,16 @@
 require 'utils'
 
+DEBUG = false
+if DEBUG then
+    LOG_LEVEL = 5
+else
+    LOG_LEVEL = 2.5
+end
+hs.hotkey.setLogLevel(LOG_LEVEL) -- default=3
+local function debug_print(...)
+    if DEBUG then check(...) end
+end
+
 local function monitor(keycode, state)
     if MONITORING then
         if MONITORING['stroke'] then
@@ -20,7 +31,7 @@ end
 
 -- enter hammerspoon mode by shortcut
 hyper = {'cmd', 'ctrl', 'alt', 'shift'}
-MONITORING = {['stroke']=false, ['mods']=false}
+MONITORING = {['stroke']=DEBUG, ['mods']=DEBUG}
 HS_MODE = {activated=false,
     hs.hotkey.new({}, 'r', hs.reload),
     hs.hotkey.new({}, 's', function() MONITORING['stroke']=not MONITORING['stroke'] end),
