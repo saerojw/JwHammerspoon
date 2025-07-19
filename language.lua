@@ -7,10 +7,7 @@ end
 
 
 function set_language(lan)
-    if lan=="Korean" then
-        hs.keycodes.currentSourceID(language["English"])
-        hs.keycodes.currentSourceID(language["English"])
-    end
+    -- hs.keycodes.currentSourceID(language["English"])
     hs.keycodes.currentSourceID(language[lan])
 end
 

@@ -159,6 +159,8 @@ modChange_event = hs.eventtap.new(
         end
 
         if MODS.match(keycode, 'rightctrl', 'tapped') then
+            toggle_language('Korean', 'English')
+        elseif MODS.match(keycode, 'rightshift', 'tapped') then
             set_language('Korean')
         elseif MODS.match(keycode, 'leftshift', 'tapped') and t_LShiftPressed<200 then
             set_language('English')
