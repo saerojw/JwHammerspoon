@@ -57,7 +57,6 @@ hs.hotkey.bind(hyper, 'h',
 require 'capslock'
 require 'language'
 require 'remapping' -- get hotkey condition table 'HK_CONDS'
-hs.hotkey.setLogLevel(2.5) -- default=3
 hs.fnutils.each({
 -- {cond_kc_mods, src_key, tgt_kc_mods, tgt_key, expand_kc_mods}
     {{'ctrl'},                  'delete',   {},                 'forwarddelete',    {}},
@@ -71,9 +70,12 @@ hs.fnutils.each({
     {{'rightctrl'},             ',',        {'shift'},          ',',                {}},
     {{'rightctrl'},             ".",        {'shift'},          ".",                {}},
     {{'rightctrl'},             'a',        {},                 'home',             {'shift'}},
-    {{'alt'},                   'b',        {'alt'},            'left',             {'shift'}},
+    {{'alt'},                   'b',        {},                 'left',             {'shift'}},
+    {{'rightctrl'},             'b',        {'alt'},            'left',             {'shift'}},
     {{'rightctrl'},             'd',        {},                 'forwarddelete',    {}},
-    {{'alt'},                   'f',        {'alt'},            'right',            {'shift'}},
+    {{'rightctrl'},             'e',        {},                 'end',              {'shift'}},
+    {{'alt'},                   'f',        {},                 'right',            {'shift'}},
+    {{'rightctrl'},             'f',        {'alt'},            'right',            {'shift'}},
     {{'rightctrl'},             'g',        {'alt'},            'return',           {}},
     {{'rightctrl'},             'h',        {},                 'delete',           {}},
     {{'rightctrl'},             'i',        {},                 'up',               {'cmd', 'shift'}},
@@ -84,13 +86,15 @@ hs.fnutils.each({
     {{'rightctrl', 'alt'},      'k',        {'alt'},            'down',             {}},
     {{'rightctrl'},             'l',        {},                 'right',            {'cmd', 'shift'}},
     {{'rightctrl', 'alt'},      'l',        {'alt'},            'right',            {'shift'}},
-    {{'alt'},                   'n',        {},                 'pagedown',         {'shift'}},
+    {{'alt'},                   'n',        {},                 'down',             {'shift'}},
+    {{'rightctrl'},             'n',        {},                 'pagedown',         {'shift'}},
     {{'rightctrl', 'alt'},      'n',        {'alt'},            'down',             {}},
-    {{'rightctrl', 'shift'},    'n',        {'shift'},          'down',             {}},
-    {{'alt'},                   'p',        {},                 'pageup',           {'shift'}},
+    {{'alt'},                   'p',        {},                 'up',               {'shift'}},
+    {{'rightctrl'},             'p',        {},                 'pageup',           {'shift'}},
     {{'rightctrl', 'alt'},      'p',        {'alt'},            'up',               {}},
-    {{'rightctrl', 'shift'},    'p',        {'shift'},          'up',               {}},
     {{'rightctrl'},             'r',        {},                 'return',           {'cmd', 'alt', 'shift'}},
+    {{'alt'},                   'u',        {},                 'up',               {'shift'}},
+    {{'rightctrl'},             'u',        {},                 'pageup',           {'shift'}},
     {{'rightctrl', 'alt'},      'u',        {'alt'},            'up',               {}},
     {{'leftcmd'},               'b',        {'ctrl'},           'b',                {}},
 -- {cond_kc_mods, src_key, pressedfn, releasedfn, repeatfn}
@@ -122,7 +126,7 @@ function disable_cond(hotkey)
     end
     --
     local disable = false
-    if hotkey_cond(hotkey, {'⌃A', '⌃E'}) then
+    if hotkey_cond(hotkey, {'⌃A', '⌃E', '^N', '^P'}) then
         disable = not (MSoffice or vscode)
     elseif hotkey_cond(hotkey, {'⌘B'}) then
         disable = not iTerm2
