@@ -128,11 +128,10 @@ modChange_event = hs.eventtap.new(
         local keycode = MODS.update(event)
         monitor(keaycode)
 
-        if MODS.pressedExactly({"leftshift"}) then
-            t_LShiftDown = hs.timer.absoluteTime()
+        if MODS.pressedExactly({"leftshift"}) or MODS.pressedExactly({"rightshift"}) or MODS.pressedExactly({"rightctrl"}) then
+            t_KeyDown = hs.timer.absoluteTime()
         end
-        local t_LShiftPressed = (hs.timer.absoluteTime() - t_LShiftDown) / 1000000 -- ms
-
+        local t_KeyPressed = (hs.timer.absoluteTime() - t_KeyDown) / 1000000 -- ms
         for hk_cond_id, hotkeys in pairs(HK_CONDS) do
             local hk_cond = {}
             for cond in string.gmatch(hk_cond_id, '[^%s]+') do
@@ -157,12 +156,14 @@ modChange_event = hs.eventtap.new(
             end
         end
 
-        if MODS.match(keycode, 'rightctrl', 'tapped') then
-            toggle_language('Korean', 'English')
-        elseif MODS.match(keycode, 'rightshift', 'tapped') then
-            set_language('Korean')
-        elseif MODS.match(keycode, 'leftshift', 'tapped') and t_LShiftPressed<200 then
-            set_language('English')
+        if t_KeyPressed < 200 then
+            if MODS.match(keycode, 'rightctrl', 'tapped') then
+                toggle_language('Korean', 'English')
+            elseif MODS.match(keycode, 'rightshift', 'tapped') then
+                set_language('Korean')
+            elseif MODS.match(keycode, 'leftshift', 'tapped') then
+                set_language('English')
+            end
         end
         if MODS[keycode]~=nil and not MODS.pressed(keycode) then
             MODS.reset()
@@ -184,6 +185,10 @@ keyDown_event = hs.eventtap.new(
             set_language('English')
         -- Sometimes, ^a and ^e not working when language is Korean
         elseif (keycode=='a' or keycode=='e') and is_language('Korean') and MODS.pressedExactly({"rightctrl"}) then
+            set_language('English')
+            ae_toggle_lan = true
+        -- Sometimes, ⌘b not working when language is Korean
+        elseif (keycode=='b') and is_language('Korean') and MODS.pressedExactly({"cmd"}) then
             set_language('English')
             ae_toggle_lan = true
         end
