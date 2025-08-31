@@ -141,7 +141,7 @@ modChange_event = hs.eventtap.new(
     {hs.eventtap.event.types.flagsChanged},
     function (event)
         local keycode = MODS.update(event)
-        monitor(keaycode)
+        monitor(keycode)
 
         if MODS.pressedExactly({"leftshift"}) or MODS.pressedExactly({"rightshift"}) or MODS.pressedExactly({"rightctrl"}) then
             t_KeyDown = hs.timer.absoluteTime()
